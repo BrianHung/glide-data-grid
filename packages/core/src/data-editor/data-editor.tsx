@@ -1924,26 +1924,27 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
 
                 if (gridSelection.current === undefined) return;
                 let [col, row] = gridSelection.current.cell;
+                let {x, y, width, height} = gridSelection.current.range;
                 let freeMove = false;
 
                 if (keybindings.selectColumn && isHotkey("ctrl+ ", event) && columnSelect !== "none") {
                     if (selectedColumns.hasIndex(col)) {
-                        setSelectedColumns(selectedColumns.remove(col), undefined, true);
+                        setSelectedColumns(selectedColumns.remove([x, x + width]), undefined, true);
                     } else {
                         if (columnSelect === "single") {
                             setSelectedColumns(CompactSelection.fromSingleSelection(col), undefined, true);
                         } else {
-                            setSelectedColumns(undefined, col, true);
+                            setSelectedColumns(selectedColumns.add([x, x + width]), col, true);
                         }
                     }
                 } else if (keybindings.selectRow && isHotkey("shift+ ", event) && rowSelect !== "none") {
                     if (selectedRows.hasIndex(row)) {
-                        setSelectedRows(selectedRows.remove(row), undefined, true);
+                        setSelectedRows(selectedRows.remove([y, y + height]), undefined, true);
                     } else {
                         if (rowSelect === "single") {
                             setSelectedRows(CompactSelection.fromSingleSelection(row), undefined, true);
                         } else {
-                            setSelectedRows(undefined, row, true);
+                            setSelectedRows(selectedRows.add([y, y + height]), row, true);
                         }
                     }
                 } else if (
