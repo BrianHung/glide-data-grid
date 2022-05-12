@@ -1069,12 +1069,16 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
             // We don't want to steal the focus if we don't currently own the focus.
             if (ref.current === null || !ref.current.contains(document.activeElement)) return;
             if (el === null && selectionRef.current.current !== undefined) {
-                canvasRef?.current?.focus({
-                    preventScroll: true,
+                window.requestAnimationFrame(() => {
+                    canvasRef?.current?.focus({
+                        preventScroll: true,
+                    });
                 });
             } else if (el !== null) {
-                el.focus({
-                    preventScroll: true,
+                window.requestAnimationFrame(() => {
+                    el.focus({
+                        preventScroll: true,
+                    });
                 });
             }
             focusRef.current = el;
