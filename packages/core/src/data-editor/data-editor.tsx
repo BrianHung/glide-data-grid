@@ -742,10 +742,11 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
         target: Rectangle;
         content: GridCell;
         theme: FullTheme;
-        initialValue: string | undefined;
+        initialValue?: string;
         cell: Item;
         highlight: boolean;
         forceEditMode: boolean;
+        key?: string;
     }>();
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
     const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
@@ -1405,8 +1406,11 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
     );
 
     const reselect = React.useCallback(
-        (bounds: Rectangle, fromKeyboard: boolean, initialValue?: string) => {
+        (bounds: Rectangle, key?: string) => {
             if (gridSelection.current === undefined) return;
+
+            const fromKeyboard = key !== undefined;
+            const initialValue = key?.length === 1 ? key : undefined; // Ignore activateCell keys.
 
             const [col, row] = gridSelection.current.cell;
             const c = getMangledCellContent([col, row]);
@@ -1440,6 +1444,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                     cell: [col, row],
                     highlight: initialValue === undefined,
                     forceEditMode: initialValue !== undefined,
+                    key,
                 });
             } else if (c.kind === GridCellKind.Boolean && fromKeyboard && c.readonly !== true) {
                 mangledOnCellsEdited([
@@ -2299,7 +2304,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                     }
                     if (shouldActivate) {
                         onCellActivated?.([col - rowMarkerOffset, row]);
-                        reselect(a.bounds, false);
+                        reselect(a.bounds);
                         return true;
                     }
                 }
@@ -3144,7 +3149,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                     }, 0);
                 } else {
                     onCellActivated?.([col - rowMarkerOffset, row]);
-                    reselect(bounds, true);
+                    reselect(bounds, event.key);
                 }
             } else if (gridSelection.current.range.height > 1 && isHotkey(keys.downFill, event, details)) {
                 fillDown();
@@ -3352,7 +3357,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                 ) {
                     return;
                 }
-                reselect(event.bounds, true, event.key);
+                reselect(event.bounds, event.key);
                 event.stopPropagation();
                 event.preventDefault();
             }

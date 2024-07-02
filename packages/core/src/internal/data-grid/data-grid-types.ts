@@ -391,6 +391,7 @@ export type ProvideEditorComponent<T extends InnerGridCell> = React.FunctionComp
     readonly markdownDivCreateNode?: (content: string) => DocumentFragment;
     readonly target: Rectangle;
     readonly forceEditMode: boolean;
+    readonly key?: string;
     readonly isValid?: boolean;
     readonly theme: Theme;
 }>;
